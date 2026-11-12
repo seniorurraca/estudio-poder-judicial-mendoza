@@ -80,7 +80,25 @@ export function setLastVisit(moduleId, tab) {
 
 export const lastVisit = () => state.last;
 
+export const nickname = () => state.nickname || "";
+
+export function setNickname(value) {
+  state.nickname = value;
+  save();
+}
+
+export function profileSnapshot() {
+  const answers = Object.values(state.answers);
+  return {
+    nickname: nickname(),
+    streak: streak(),
+    answered: answers.reduce((sum, a) => sum + a.ok + a.bad, 0),
+    bestExam: Math.max(0, ...state.exams.map((e) => Math.round((e.correct / e.total) * 100))),
+    today: todayCount(),
+  };
+}
+
 export function resetProgress() {
-  state = emptyState();
+  state = { ...emptyState(), nickname: state.nickname };
   save();
 }

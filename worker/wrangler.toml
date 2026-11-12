@@ -1,0 +1,11 @@
+name = "estudio-pj-mza-api"
+main = "src/index.mjs"
+compatibility_date = "2026-10-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://seniorurraca.github.io,http://localhost:5173"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "estudio-pj-mza"
+database_id = "e3c3bc91-6b6a-4c87-bfe6-d46e755b697b"

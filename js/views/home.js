@@ -1,5 +1,5 @@
 import { CARDS, EXAM, MODULES, NOTEBOOK_URL, QUESTIONS, cardsOf, moduleById, questionsOf } from "../data.js";
-import { DAILY_GOAL, answerOf, exams, isCardMastered, lastVisit, streak, todayCount } from "../store.js";
+import { DAILY_GOAL, answerOf, exams, isCardMastered, lastVisit, nickname, streak, todayCount } from "../store.js";
 import { escapeHtml, percent } from "../ui.js";
 import { TABS } from "./module.js";
 
@@ -67,11 +67,11 @@ export function renderHome(view) {
   view.innerHTML = `
     <section class="welcome">
       <div>
-        <h1>${greeting()} 👋</h1>
+        <h1>${greeting()}${nickname() ? `, ${escapeHtml(nickname())}` : ""} 👋</h1>
         <p class="muted">Examen de Conocimientos Específicos · ${EXAM.questions} preguntas · ${EXAM.minutes} min</p>
       </div>
       <div class="pill-stats">
-        <span class="pill streak ${days ? "on" : ""}">🔥 ${days} ${days === 1 ? "día" : "días"}</span>
+        <a href="#/ranking" class="pill streak ${days ? "on" : ""}">🔥 ${days} ${days === 1 ? "día" : "días"}</a>
       </div>
     </section>
 

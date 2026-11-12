@@ -1,5 +1,8 @@
 const KEY = "pj-mza-2026-progress-v1";
 const MAX_CARD_LEVEL = 3;
+const DAY_MS = 86_400_000;
+
+export const DAILY_GOAL = 20;
 
 function load() {
   try {
@@ -9,7 +12,9 @@ function load() {
   }
 }
 
-let state = { answers: {}, cards: {}, exams: [], ...load() };
+const emptyState = () => ({ answers: {}, cards: {}, exams: [], days: {}, last: null });
+
+let state = { ...emptyState(), ...load() };
 
 function save() {
   try {
@@ -19,12 +24,20 @@ function save() {
   }
 }
 
+const dayKey = (time = Date.now()) => new Date(time).toLocaleDateString("sv-SE");
+
+function countActivity() {
+  const today = dayKey();
+  state.days[today] = (state.days[today] || 0) + 1;
+}
+
 export function recordAnswer(questionId, correct) {
   const entry = state.answers[questionId] || { ok: 0, bad: 0 };
   if (correct) entry.ok++;
   else entry.bad++;
   entry.last = correct;
   state.answers[questionId] = entry;
+  countActivity();
   save();
 }
 
@@ -34,6 +47,7 @@ export const cardLevel = (cardId) => state.cards[cardId] || 0;
 
 export function rateCard(cardId, known) {
   state.cards[cardId] = known ? Math.min(cardLevel(cardId) + 1, MAX_CARD_LEVEL) : 0;
+  countActivity();
   save();
 }
 
@@ -46,7 +60,27 @@ export function recordExam(result) {
 
 export const exams = () => state.exams;
 
+export const todayCount = () => state.days[dayKey()] || 0;
+
+export function streak() {
+  let count = 0;
+  let time = Date.now();
+  if (!state.days[dayKey(time)]) time -= DAY_MS;
+  while (state.days[dayKey(time)]) {
+    count++;
+    time -= DAY_MS;
+  }
+  return count;
+}
+
+export function setLastVisit(moduleId, tab) {
+  state.last = { moduleId, tab };
+  save();
+}
+
+export const lastVisit = () => state.last;
+
 export function resetProgress() {
-  state = { answers: {}, cards: {}, exams: [] };
+  state = emptyState();
   save();
 }

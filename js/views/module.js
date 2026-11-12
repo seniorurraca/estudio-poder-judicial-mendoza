@@ -1,13 +1,24 @@
 import { cardsOf, moduleById, questionsOf } from "../data.js";
+import { setLastVisit } from "../store.js";
 import { escapeHtml, richText, sample } from "../ui.js";
+import { renderAudio } from "./audio.js";
 import { runFlashcards } from "./flashcards.js";
 import { runQuiz } from "./quiz.js";
+import { renderSlides } from "./slides.js";
+import { renderGuide, renderInfographics, renderTable } from "./studio.js";
 
-const TABS = [
-  { id: "resumen", label: "📖 Resumen" },
-  { id: "mapa", label: "🗺️ Mapa" },
-  { id: "tarjetas", label: "🃏 Tarjetas" },
-  { id: "test", label: "📝 Test" },
+const TOOL_GROUPS = ["Aprender", "Repasar", "Practicar"];
+
+export const TABS = [
+  { id: "resumen", icon: "📖", label: "Resumen", desc: "Lo esencial, por secciones", group: "Aprender", color: "#4f46e5" },
+  { id: "audio", icon: "🎧", label: "Audio", desc: "Escuchá el resumen", group: "Aprender", color: "#0891b2" },
+  { id: "presentacion", icon: "🖥️", label: "Presentación", desc: "Diapositivas para pasar", group: "Aprender", color: "#db2777" },
+  { id: "mapa", icon: "🗺️", label: "Mapa mental", desc: "Vista de conjunto", group: "Aprender", color: "#7c3aed" },
+  { id: "infografia", icon: "📊", label: "Infografía", desc: "Esquemas visuales", group: "Aprender", color: "#ea580c" },
+  { id: "datos", icon: "📋", label: "Tabla de datos", desc: "Leyes, plazos y artículos", group: "Repasar", color: "#059669" },
+  { id: "guia", icon: "🎯", label: "Guía", desc: "Clave y “no confundir”", group: "Repasar", color: "#dc2626" },
+  { id: "tarjetas", icon: "🃏", label: "Tarjetas", desc: "Memorizá con flashcards", group: "Practicar", color: "#ca8a04" },
+  { id: "test", icon: "📝", label: "Cuestionario", desc: "Preguntas con corrección", group: "Practicar", color: "#2563eb" },
 ];
 
 function renderSummary(root, mod) {
@@ -78,29 +89,61 @@ function renderTestStart(root, mod) {
 
 const TAB_RENDERERS = {
   resumen: renderSummary,
+  audio: renderAudio,
   mapa: renderMap,
+  presentacion: renderSlides,
+  infografia: renderInfographics,
+  datos: renderTable,
+  guia: renderGuide,
   tarjetas: (root, mod) => runFlashcards(root, cardsOf(mod.id)),
   test: renderTestStart,
 };
 
-export function renderModule(view, moduleId, tab = "resumen") {
+const toolTile = (mod, t) => `
+  <a class="tool-tile" href="#/modulo/${mod.id}/${t.id}" style="--tool:${t.color}">
+    <span class="tool-icon">${t.icon}</span>
+    <span class="tool-text"><strong>${t.label}</strong><small>${t.desc}</small></span>
+  </a>`;
+
+function renderStudioHome(view, mod) {
+  view.innerHTML = `
+    <div class="module-banner" style="--chip:${mod.color}">
+      <a href="#/" class="back">← Inicio</a>
+      <div class="eyebrow">Módulo ${mod.num}</div>
+      <h1>${escapeHtml(mod.title)}</h1>
+      <p>${mod.summary.length} secciones · ${mod.cards.length} tarjetas · ${mod.questions.length} preguntas</p>
+    </div>
+    ${TOOL_GROUPS.map(
+      (group) => `
+      <h2 class="group-title">${group}</h2>
+      <div class="tool-grid">${TABS.filter((t) => t.group === group).map((t) => toolTile(mod, t)).join("")}</div>`
+    ).join("")}`;
+}
+
+function renderTool(view, mod, tab) {
+  const tool = TABS.find((t) => t.id === tab);
+  view.innerHTML = `
+    <div class="tool-head" style="--chip:${mod.color}">
+      <a href="#/modulo/${mod.id}" class="back">← Módulo ${mod.num} · ${escapeHtml(mod.short)}</a>
+      <h1><span class="tool-icon small" style="--tool:${tool.color}">${tool.icon}</span>${tool.label}</h1>
+    </div>
+    <nav class="tabs">
+      ${TABS.map(
+        (t) => `<a href="#/modulo/${mod.id}/${t.id}" class="${t.id === tab ? "active" : ""}">${t.icon} ${t.label}</a>`
+      ).join("")}
+    </nav>
+    <div id="tab"></div>`;
+  view.querySelector(".tabs .active").scrollIntoView({ inline: "center", block: "nearest" });
+  setLastVisit(mod.id, tab);
+  TAB_RENDERERS[tab](view.querySelector("#tab"), mod);
+}
+
+export function renderModule(view, moduleId, tab) {
   const mod = moduleById(moduleId);
   if (!mod) {
     view.innerHTML = `<p>Módulo no encontrado. <a href="#/">Volver</a></p>`;
     return;
   }
-  const activeTab = TAB_RENDERERS[tab] ? tab : "resumen";
-  view.innerHTML = `
-    <div class="module-head" style="--chip:${mod.color}">
-      <a href="#/" class="back">← Inicio</a>
-      <div class="eyebrow">Módulo ${mod.num}</div>
-      <h1>${escapeHtml(mod.title)}</h1>
-    </div>
-    <nav class="tabs">
-      ${TABS.map(
-        (t) => `<a href="#/modulo/${mod.id}/${t.id}" class="${t.id === activeTab ? "active" : ""}">${t.label}</a>`
-      ).join("")}
-    </nav>
-    <div id="tab"></div>`;
-  TAB_RENDERERS[activeTab](view.querySelector("#tab"), mod);
+  if (TAB_RENDERERS[tab]) renderTool(view, mod, tab);
+  else renderStudioHome(view, mod);
 }

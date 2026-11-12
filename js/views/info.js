@@ -1,4 +1,4 @@
-import { EXAM } from "../data.js";
+import { EXAM, NOTEBOOK_URL } from "../data.js";
 
 const OFFICIAL = "https://jusmendoza.gob.ar/concurso-ingreso-administrativo-2026/";
 const MATERIAL = "https://jusmendoza.gob.ar/concurso-ingreso-administrativo-2026-material-de-estudio/";
@@ -36,6 +36,10 @@ export function renderInfo(view) {
         <li>Atención para un Servicio de Justicia</li>
       </ol>
       <p class="muted small">Descargá los PDF desde la <a href="${MATERIAL}" target="_blank" rel="noopener">página de material de estudio</a>. Los resúmenes y preguntas de esta app son de práctica y no reemplazan la lectura del material completo.</p>
+    </div>
+    <div class="card">
+      <h3>💬 Preguntarle a la IA</h3>
+      <p>Para dudas puntuales sobre el material, usá el <a href="${NOTEBOOK_URL}" target="_blank" rel="noopener">notebook de NotebookLM</a> cargado con los PDF oficiales. Requiere iniciar sesión con una cuenta de Google.</p>
     </div>
     <div class="card">
       <h3>💾 Tu progreso</h3>

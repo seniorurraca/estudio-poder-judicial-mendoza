@@ -2,20 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="App de estudio para el examen de Conocimientos Específicos del Concurso de Ingreso Administrativo 2026 del Poder Judicial de Mendoza.">
-  <meta name="theme-color" content="#1d3557">
+  <meta name="theme-color" content="#4f46e5">
   <title>Estudio PJ Mendoza 2026</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#/">⚖️ <span>Estudio PJ Mendoza 2026</span></a>
-    <nav class="mainnav" id="mainnav">
+    <a class="brand" href="#/"><span class="brand-logo">⚖️</span><span class="brand-name">Estudio PJ <b>Mendoza</b></span></a>
+    <nav class="mainnav">
       <a href="#/" data-nav="home">Inicio</a>
       <a href="#/simulacro" data-nav="simulacro">Simulacro</a>
       <a href="#/repaso" data-nav="repaso">Repaso</a>
@@ -26,6 +26,12 @@
   <footer class="footer container">
     Material basado en el contenido oficial publicado por la Suprema Corte de Justicia de Mendoza para el Concurso de Ingreso 2026. App de estudio no oficial.
   </footer>
+  <nav class="bottomnav">
+    <a href="#/" data-nav="home"><span>🏠</span>Inicio</a>
+    <a href="#/simulacro" data-nav="simulacro"><span>🎯</span>Simulacro</a>
+    <a href="#/repaso" data-nav="repaso"><span>🔁</span>Repaso</a>
+    <a href="#/info" data-nav="info"><span>ℹ️</span>Examen</a>
+  </nav>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

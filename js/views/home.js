@@ -1,71 +1,102 @@
-import { CARDS, EXAM, MODULES, QUESTIONS, cardsOf, questionsOf } from "../data.js";
-import { answerOf, exams, isCardMastered } from "../store.js";
-import { escapeHtml, percent, progressBar } from "../ui.js";
+import { CARDS, EXAM, MODULES, NOTEBOOK_URL, QUESTIONS, cardsOf, moduleById, questionsOf } from "../data.js";
+import { DAILY_GOAL, answerOf, exams, isCardMastered, lastVisit, streak, todayCount } from "../store.js";
+import { escapeHtml, percent } from "../ui.js";
+import { TABS } from "./module.js";
 
 const answeredRight = (questions) => questions.filter((q) => answerOf(q.id)?.ok).length;
 const mastered = (cards) => cards.filter((c) => isCardMastered(c.id)).length;
 
-function moduleCard(mod) {
+const ring = (value, color, label) => `
+  <div class="ring" style="--value:${value};--ring:${color}"><span>${label}</span></div>`;
+
+function moduleProgress(mod) {
   const questions = questionsOf(mod.id);
   const cards = cardsOf(mod.id);
-  const qPct = percent(answeredRight(questions), questions.length);
-  const cPct = percent(mastered(cards), cards.length);
-  return `
-    <article class="card module-card" style="--chip:${mod.color}">
-      <div class="module-num">${mod.num}</div>
-      <h3>${escapeHtml(mod.title)}</h3>
-      <div class="mini-stat"><span>Preguntas acertadas</span><span>${qPct}%</span></div>
-      ${progressBar(qPct, mod.color)}
-      <div class="mini-stat"><span>Tarjetas dominadas</span><span>${cPct}%</span></div>
-      ${progressBar(cPct, mod.color)}
-      <div class="module-links">
-        <a href="#/modulo/${mod.id}/resumen">📖 Resumen</a>
-        <a href="#/modulo/${mod.id}/mapa">🗺️ Mapa</a>
-        <a href="#/modulo/${mod.id}/tarjetas">🃏 Tarjetas</a>
-        <a href="#/modulo/${mod.id}/test">📝 Test</a>
-      </div>
-    </article>`;
+  return percent(answeredRight(questions) + mastered(cards), questions.length + cards.length);
 }
+
+function greeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "¡Buen día!";
+  if (hour < 20) return "¡Buenas tardes!";
+  return "¡Buenas noches!";
+}
+
+function continueCard() {
+  const last = lastVisit();
+  const mod = last && moduleById(last.moduleId);
+  const tool = mod && TABS.find((t) => t.id === last.tab);
+  if (!tool) {
+    return `
+      <a class="continue-card" href="#/modulo/m1" style="--chip:${MODULES[0].color}">
+        <span class="tool-icon" style="--tool:${MODULES[0].color}">🚀</span>
+        <span><small>Empezá por acá</small><strong>Módulo 1 · ${escapeHtml(MODULES[0].short)}</strong></span>
+        <span class="arrow">→</span>
+      </a>`;
+  }
+  return `
+    <a class="continue-card" href="#/modulo/${mod.id}/${tool.id}" style="--chip:${mod.color}">
+      <span class="tool-icon" style="--tool:${tool.color}">${tool.icon}</span>
+      <span><small>Continuar donde dejaste</small><strong>${tool.label} · M${mod.num} ${escapeHtml(mod.short)}</strong></span>
+      <span class="arrow">→</span>
+    </a>`;
+}
+
+const moduleRow = (mod) => {
+  const value = moduleProgress(mod);
+  return `
+    <a class="module-row" href="#/modulo/${mod.id}" style="--chip:${mod.color}">
+      <span class="module-num">${mod.num}</span>
+      <span class="module-info">
+        <strong>${escapeHtml(mod.title)}</strong>
+        <small>${mod.questions.length} preguntas · ${mod.cards.length} tarjetas</small>
+      </span>
+      ${ring(value, mod.color, `${value}%`)}
+    </a>`;
+};
 
 function lastExamText() {
   const [last] = exams();
-  if (!last) return "Todavía no hiciste ningún simulacro.";
-  return `Último simulacro: <strong>${percent(last.correct, last.total)}%</strong> (${last.correct}/${last.total})`;
+  return last ? `${percent(last.correct, last.total)}%` : "—";
 }
 
 export function renderHome(view) {
-  const qPct = percent(answeredRight(QUESTIONS), QUESTIONS.length);
-  const cPct = percent(mastered(CARDS), CARDS.length);
+  const today = todayCount();
+  const goalPct = Math.min(100, percent(today, DAILY_GOAL));
+  const days = streak();
   view.innerHTML = `
-    <section class="hero">
+    <section class="welcome">
       <div>
-        <div class="eyebrow">Concurso de Ingreso Administrativo 2026</div>
-        <h1>Preparación para el examen de Conocimientos Específicos</h1>
-        <p>${EXAM.questions} preguntas de opción múltiple · ${EXAM.options} opciones · ${EXAM.minutes} minutos. Basado en los 5 módulos oficiales.</p>
-        <div class="actions">
-          <a class="btn primary big" href="#/simulacro">🎯 Hacer un simulacro</a>
-          <a class="btn big" href="#/repaso">🔁 Repasar errores</a>
-        </div>
+        <h1>${greeting()} 👋</h1>
+        <p class="muted">Examen de Conocimientos Específicos · ${EXAM.questions} preguntas · ${EXAM.minutes} min</p>
       </div>
-      <div class="card stats">
-        <div class="stat"><span class="stat-num">${QUESTIONS.length}</span><span>preguntas</span></div>
-        <div class="stat"><span class="stat-num">${CARDS.length}</span><span>tarjetas</span></div>
-        <div class="stat-line"><span>Preguntas acertadas</span><span>${qPct}%</span></div>
-        ${progressBar(qPct)}
-        <div class="stat-line"><span>Tarjetas dominadas</span><span>${cPct}%</span></div>
-        ${progressBar(cPct)}
-        <p class="muted small">${lastExamText()}</p>
+      <div class="pill-stats">
+        <span class="pill streak ${days ? "on" : ""}">🔥 ${days} ${days === 1 ? "día" : "días"}</span>
       </div>
     </section>
-    <h2 class="section-title">Módulos</h2>
-    <div class="grid">${MODULES.map(moduleCard).join("")}</div>
-    <div class="card tip">
-      <strong>💡 Cómo estudiar con la app</strong>
-      <ol>
-        <li>Leé el <b>resumen</b> y el <b>mapa</b> de un módulo.</li>
-        <li>Repasá las <b>tarjetas</b> hasta dominarlas.</li>
-        <li>Hacé el <b>test</b> del módulo (corrige al instante).</li>
-        <li>Cuando tengas todos, hacé <b>simulacros</b> cronometrados y repasá tus errores.</li>
-      </ol>
-    </div>`;
+
+    <section class="today card">
+      ${ring(goalPct, "var(--accent)", `${today}/${DAILY_GOAL}`)}
+      <div class="today-text">
+        <strong>${goalPct >= 100 ? "¡Meta diaria cumplida! 🎉" : "Meta diaria"}</strong>
+        <span class="muted small">Respondé ${DAILY_GOAL} preguntas o tarjetas por día para mantener la racha.</span>
+      </div>
+    </section>
+
+    ${continueCard()}
+
+    <div class="quick-actions">
+      <a class="quick" href="#/simulacro" style="--tool:#4f46e5"><span class="tool-icon">🎯</span><strong>Simulacro</strong><small>50 preg · 40 min</small></a>
+      <a class="quick" href="#/repaso" style="--tool:#dc2626"><span class="tool-icon">🔁</span><strong>Repaso</strong><small>Tus errores</small></a>
+      <a class="quick" href="${NOTEBOOK_URL}" target="_blank" rel="noopener" style="--tool:#059669"><span class="tool-icon">💬</span><strong>Preguntar</strong><small>IA NotebookLM</small></a>
+    </div>
+
+    <h2 class="group-title">Módulos</h2>
+    <div class="module-list">${MODULES.map(moduleRow).join("")}</div>
+
+    <section class="stats-strip card">
+      <div><b>${percent(answeredRight(QUESTIONS), QUESTIONS.length)}%</b><span>preguntas acertadas</span></div>
+      <div><b>${mastered(CARDS)}/${CARDS.length}</b><span>tarjetas dominadas</span></div>
+      <div><b>${lastExamText()}</b><span>último simulacro</span></div>
+    </section>`;
 }

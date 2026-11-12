@@ -3,7 +3,7 @@ export default {
   num: 2,
   title: "El Poder Judicial de Mendoza (Fueros)",
   short: "Fueros del Poder Judicial",
-  color: "#7a4fd1",
+  color: "#8b5cf6",
   summary: [
     {
       title: "2.1 Fuero Civil: el proceso y sus principios",

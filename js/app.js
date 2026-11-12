@@ -1,3 +1,4 @@
+import { setupThemeToggle } from "./theme.js";
 import { runLeaveHandlers } from "./ui.js";
 import { renderExam } from "./views/exam.js";
 import { renderHome } from "./views/home.js";
@@ -27,4 +28,5 @@ function route() {
 }
 
 window.addEventListener("hashchange", route);
+setupThemeToggle();
 route();

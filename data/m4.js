@@ -3,7 +3,7 @@ export default {
   num: 4,
   title: "Violencia de Género",
   short: "Violencia de Género",
-  color: "#c2417a",
+  color: "#ec4899",
   summary: [
     {
       title: "Marco del material",

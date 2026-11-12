@@ -3,7 +3,7 @@ export default {
   num: 3,
   title: "Derechos Humanos",
   short: "Derechos Humanos",
-  color: "#1f9d6b",
+  color: "#10b981",
   summary: [
     {
       title: "Introducción: qué son los DDHH",

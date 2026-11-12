@@ -3,7 +3,7 @@ export default {
   num: 5,
   title: "Atención para un Servicio de Justicia",
   short: "Atención al Ciudadano",
-  color: "#d97a1e",
+  color: "#f97316",
   summary: [
     {
       title: "Introducción",

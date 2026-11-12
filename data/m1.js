@@ -3,7 +3,7 @@ export default {
   num: 1,
   title: "La Organización del Estado",
   short: "Organización del Estado",
-  color: "#3b6fd8",
+  color: "#3b82f6",
   summary: [
     {
       title: "1.1 Conceptos clave: Estado y Derecho",

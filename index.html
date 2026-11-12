@@ -11,16 +11,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <script>
+    try { if (localStorage.getItem("pj-theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch {}
+  </script>
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="#/"><span class="brand-logo">⚖️</span><span class="brand-name">Estudio PJ <b>Mendoza</b></span></a>
-    <nav class="mainnav">
-      <a href="#/" data-nav="home">Inicio</a>
-      <a href="#/simulacro" data-nav="simulacro">Simulacro</a>
-      <a href="#/repaso" data-nav="repaso">Repaso</a>
-      <a href="#/info" data-nav="info">Examen</a>
-    </nav>
+    <div class="topbar-right">
+      <nav class="mainnav">
+        <a href="#/" data-nav="home">Inicio</a>
+        <a href="#/simulacro" data-nav="simulacro">Simulacro</a>
+        <a href="#/repaso" data-nav="repaso">Repaso</a>
+        <a href="#/info" data-nav="info">Examen</a>
+      </nav>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar entre modo claro y oscuro">🌙</button>
+    </div>
   </header>
   <main id="view" class="container"></main>
   <footer class="footer container">
